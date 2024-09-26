@@ -9,6 +9,7 @@ import com.genymobile.scrcpy.audio.AudioRawRecorder;
 import com.genymobile.scrcpy.audio.AudioSource;
 import com.genymobile.scrcpy.control.ControlChannel;
 import com.genymobile.scrcpy.control.Controller;
+import com.genymobile.scrcpy.control.Controller2;
 import com.genymobile.scrcpy.control.DeviceMessage;
 import com.genymobile.scrcpy.device.ConfigurationException;
 import com.genymobile.scrcpy.device.DesktopConnection;
@@ -149,6 +150,8 @@ public final class Server {
         List<AsyncProcessor> asyncProcessors = new ArrayList<>();
 
         DesktopConnection connection = DesktopConnection.open(scid, tunnelForward, video, audio, control, sendDummyByte);
+        Controller2 controller2 = new Controller2(device, cleanUp, options.getClipboardAutosync(), options.getPowerOn());
+        asyncProcessors.add(controller2);
         try {
             if (options.getSendDeviceMeta()) {
                 connection.sendDeviceMeta(Device.getDeviceName());
@@ -217,6 +220,7 @@ public final class Server {
             }
 
             connection.shutdown();
+            controller2.shutdown();
 
             try {
                 if (initThread != null) {
@@ -230,6 +234,7 @@ public final class Server {
             }
 
             connection.close();
+            controller2.close();
         }
     }
 
